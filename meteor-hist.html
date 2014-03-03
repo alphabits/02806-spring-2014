@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Meteor exercise</title>
+
+    <style>
+
+        body {
+          font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+          fill: none;
+          stroke: #000;
+          shape-rendering: crispEdges;
+        }
+
+        .dot {
+          stroke: #000;
+        }
+
+    </style>
+
+    <script src="libs/d3.js"></script>
+    <script src="data/year-vs-count.js"></script>
+
+    <script>
+        function plot_scatter() {
+            var margin = {top: 20, right: 20, bottom: 30, left: 40},
+                width = 960 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+
+            var x = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1);
+
+            var y = d3.scale.linear()
+                .range([height, 0]);
+
+            var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom");
+
+            var yAxis = d3.svg.axis()
+                .scale(y)
+                .orient("left")
+                .ticks(10);
+
+            var svg = d3.select("body").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+          x.domain(yearAndCount.map(function(d) { return d.year; }));
+          y.domain([0, d3.max(yearAndCount, function(d) { return d.count; })]);
+
+          svg.append("g").
+              attr("class", "xaxis axis"). // two classes, one for css formatting, one for selection below
+              attr("transform", "translate(0," + height + ")").
+              call(xAxis);
+          svg.selectAll(".xaxis text"). // select all the text elements for the xaxis
+              attr("transform", function(d) {
+                  return "translate(" + this.getBBox().height * -2 + "," + this.getBBox().height + ")rotate(-45)";
+              });
+
+          svg.append("g")
+              .attr("class", "y axis")
+              .call(yAxis)
+            .append("text")
+              .attr("transform", "rotate(-90)")
+              .attr("y", 6)
+              .attr("dy", ".71em")
+              .style("text-anchor", "end")
+              .text("Counts");
+
+          svg.selectAll(".bar")
+              .data(yearAndCount)
+            .enter().append("rect")
+              .attr("class", "bar")
+              .attr("x", function(d) { return x(d.year); })
+              .attr("width", x.rangeBand())
+              .attr("y", function(d) { return y(d.count); })
+              .attr("height", function(d) { return height - y(d.count); });
+
+        }
+
+        window.onload = plot_scatter;
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>
