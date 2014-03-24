@@ -37,10 +37,6 @@ class BaseClassifier(object):
             self.increase_feature_category_count(f, category)
         self.increase_category_count(category)
 
-    def train_from_corpus(self, corpus):
-        for doc, category in corpus:
-            self.train(doc, category)
-
     def probability_of_feature_given_category(self, feature, category):
         if self.category_count(category) == 0:
             return 0
@@ -76,8 +72,14 @@ class NaiveBayesClassifier(BaseClassifier):
     def evidence_of_category_given_document(self, document, category):
         return self.probability_of_category(category) * self.probability_of_document_given_category(document, category)
 
+    def evidences_of_categories_given_document(self, document):
+        return {c: self.evidence_of_category_given_document(document, c) for c in self.categories()}
+
     def classify(self, document, default='UNKNOWN'):
-        evidences = {c: self.evidence_of_category_given_document(document, c) for c in self.categories()}
+        evidences = self.evidences_of_categories_given_document(document)
+        return self.classify_from_evidences(evidences, default)
+
+    def classify_from_evidences(self, evidences, default='UNKNOWN'):
         best_category, max_evidence = max(evidences.iteritems(), key=operator.itemgetter(1))
         threshold = self.threshold_for_category(best_category)
 
@@ -86,3 +88,4 @@ class NaiveBayesClassifier(BaseClassifier):
             return default
 
         return best_category
+
