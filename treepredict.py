@@ -81,19 +81,24 @@ def entropy(rows):
 
 
 
-def printtree(tree,indent=''):
+def printtree(tree, indent_level=0, max_indent=None):
+   indent_string = '  '
+   # Is max level?
+   if max_indent and indent_level > max_indent:
+      return
    # Is this a leaf node?
-   if tree.results!=None:
+   if tree.results != None:
       print str(tree.results)
    else:
+      indent = indent_level*indent_string
       # Print the criteria
       print str(tree.col)+':'+str(tree.value)+'? '
 
       # Print the branches
       print indent+'T->',
-      printtree(tree.tb,indent+'  ')
+      printtree(tree.tb, indent_level+1, max_indent)
       print indent+'F->',
-      printtree(tree.fb,indent+'  ')
+      printtree(tree.fb, indent_level+1, max_indent)
 
 
 def getwidth(tree):
@@ -174,7 +179,7 @@ def prune(tree,mingain):
       fb+=[[v]]*c
     
     # Test the reduction in entropy
-    delta=entropy(tb+fb)-(entropy(tb)+entropy(fb)/2)
+    delta=entropy(tb+fb)-(entropy(tb)+entropy(fb))/2
 
     if delta<mingain:
       # Merge the branches
