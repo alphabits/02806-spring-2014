@@ -1,0 +1,6 @@
+pdflatex report.tex
+bibtex report
+pdflatex report.tex
+pdflatex report.tex
+start report.pdf
+cp report.pdf s082382.pdf
