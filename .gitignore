@@ -3,3 +3,4 @@ data/*
 course-material/*
 *.pyc
 *.mp4
+assignment-b/code/ExtendedStatisticsController.cs
